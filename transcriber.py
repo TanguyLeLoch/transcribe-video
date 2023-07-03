@@ -86,10 +86,36 @@ class YouTubeTranscriber:
         return word + ".mp4"
 
     def get_shortest_video_with_word(self, word):
+        self.short_video_by_end(word, 1)
+        self.short_video_by_start(word, 1)
+
+    def short_video_by_end(self, word, seconds):
         while True:
             video = mp.VideoFileClip(self.video_path)
             # remove the last second of the video
-            video_shorter = video.subclip(0, video.duration - 1)
+            video_shorter = video.subclip(0, video.duration - seconds)
+            # save the video
+            video_shorter.write_videofile("temp.mp4",
+                                          codec='libx264',
+                                          audio_codec='aac',
+                                          temp_audiofile='temp-audio.m4a',
+                                          remove_temp=True)
+            # transcribe the video
+            temp_transcriber = YouTubeTranscriber("temp.mp4")
+            # get the segments with the word
+            segments = temp_transcriber.get_sentences_with_word(word)
+            # if there are segments with the word, return the video
+            if len(segments) > 0:
+                # rename temp.mp4 to the word
+                os.rename("temp.mp4", self.video_path)
+            else:
+                return
+
+    def short_video_by_start(self, word, seconds):
+        while True:
+            video = mp.VideoFileClip(self.video_path)
+            # remove the last second of the video
+            video_shorter = video.subclip(seconds, video.duration)
             # save the video
             video_shorter.write_videofile("temp.mp4",
                                           codec='libx264',
