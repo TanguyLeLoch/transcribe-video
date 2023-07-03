@@ -5,7 +5,7 @@ import whisper
 import yt_dlp
 
 print("Loading model...")
-MODEL = whisper.load_model("tiny")
+MODEL = whisper.load_model("large")
 
 
 class YouTubeTranscriber:
