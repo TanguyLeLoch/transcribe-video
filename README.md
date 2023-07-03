@@ -1,4 +1,5 @@
 # Installation
+
 ```bash
 git clone git@github.com:TanguyLeLoch/transcribe-video.git
 cd transcribe-video
@@ -12,6 +13,7 @@ brew install ffmpeg
 ```
 
 # Usage
+
 ```bash
-python main.py
+python main.py https://www.youtube.com/watch?v=dzh7oYbGnFE
 ```
