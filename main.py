@@ -1,81 +1,16 @@
-import os
-import sys
-import time
-
-import moviepy.editor as mp
-import whisper
-import yt_dlp
-
-
-def download_video(url):
-    ydl_opts = {
-        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-        'outtmpl': 'video.mp4',
-    }
-
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-
-
-def check_url():
-    check = youtube_url.find("youtube.com/watch?v=")
-    if check == -1:
-        print("Invalid URL")
-        exit()
-
+from transcriber import YouTubeTranscriber
 
 # get youtube video arg from command line
-youtube_url = sys.argv[1]
-check_url()
+# youtube_url = sys.argv[1]
+youtube_url = "https://www.youtube.com/watch?v=pWpF8f9Hzl8"
+my_transcriber = YouTubeTranscriber(youtube_url)
 
-# delete video file if exists
-try:
-    os.remove("video.mp4")
-except:
-    pass
+# for segment in my_transcriber.segments:
+    # print(segment)
 
-# download video
-download_video(youtube_url)
 
-# Load Whisper model
-print("Loading model...")
-# model = whisper.load_model("base")
-model = whisper.load_model("large")
-# # Load video file
-video_path = "video.mp4"
-video = mp.VideoFileClip(video_path)
+result = my_transcriber.get_sentences_with_word("française")
 
-# # Extract audio from the video
-audio = video.audio
-
-# Set audio file path for transcription
-audio_path = "audio.wav"
-
-# Save extracted audio to WAV file
-audio.write_audiofile(audio_path)
-
-beginTime = time.time()
-
-local_time = time.localtime(beginTime)
-formatted_time = time.strftime("%H:%M:%S", local_time)
-
-print("Transcribing...\n starting time: ", formatted_time)
-# Transcribe speech from the audio file
-result = model.transcribe(audio_path)
-
-print("Time taken: ", time.time() - beginTime)
-
-# Access the transcribed text
-transcribed_text = result["text"]
-
-# Print the transcribed text
-print(transcribed_text)
-
-# Get the individual sentences or words with their timings
-segments = result["segments"]
-#
-for segment in segments:
-    text = segment["text"]
-    start_time = segment["start"]
-    end_time = segment["end"]
-    print(f"[{start_time} - {end_time}]: {text}")
+for segment in result:
+    transcribtion = YouTubeTranscriber(segment)
+    transcribtion.get_shortest_video_with_word("français")
