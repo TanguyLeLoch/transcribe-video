@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 
@@ -27,13 +28,19 @@ def check_url():
 youtube_url = sys.argv[1]
 check_url()
 
+# delete video file if exists
+try:
+    os.remove("video.mp4")
+except:
+    pass
+
 # download video
 download_video(youtube_url)
 
 # Load Whisper model
 print("Loading model...")
-model = whisper.load_model("base")
-
+# model = whisper.load_model("base")
+model = whisper.load_model("large")
 # # Load video file
 video_path = "video.mp4"
 video = mp.VideoFileClip(video_path)
@@ -48,7 +55,11 @@ audio_path = "audio.wav"
 audio.write_audiofile(audio_path)
 
 beginTime = time.time()
-print("Transcribing...\n starting time: ", beginTime)
+
+local_time = time.localtime(beginTime)
+formatted_time = time.strftime("%H:%M:%S", local_time)
+
+print("Transcribing...\n starting time: ", formatted_time)
 # Transcribe speech from the audio file
 result = model.transcribe(audio_path)
 
@@ -59,3 +70,12 @@ transcribed_text = result["text"]
 
 # Print the transcribed text
 print(transcribed_text)
+
+# Get the individual sentences or words with their timings
+segments = result["segments"]
+#
+for segment in segments:
+    text = segment["text"]
+    start_time = segment["start"]
+    end_time = segment["end"]
+    print(f"[{start_time} - {end_time}]: {text}")
