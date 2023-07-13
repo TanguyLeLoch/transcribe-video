@@ -61,5 +61,8 @@ class Transcriber:
         self.result = MODEL.transcribe('audio.wav')
 
     def create_srt_file(self):
+
+        self.result.split_by_length(max_words=3, force_len=True)
+        self.result.merge_by_punctuation(["'"])
         self.result.split_by_length(max_words=4, force_len=True)
-        self.result.to_srt_vtt('audio.srt')
+        self.result.to_srt_vtt('audio.srt', word_level=False)
